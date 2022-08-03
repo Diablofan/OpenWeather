@@ -22,6 +22,8 @@ namespace OpenWeather.Services
         /// <param name="countryCode">The 2 character ISO 3166 country code the postal code belongs to</param>
         /// <returns>A set of coordinates for representing the postal code country combination</returns>
         Task<LocationResult> GetCoordinateByCityState(string city, string state, string countryCode = "US");
+
+        Task<CurrentConditionResults> GetCurrentConditionsByCoordinate(Coordinate coordinates);
     }
 
     public class WeatherService : IWeatherService
@@ -67,6 +69,22 @@ namespace OpenWeather.Services
             var coordinate = JsonSerializer.Deserialize<PostalCodeResult>(result);
 
             return coordinate;
+        }
+
+        public async Task<CurrentConditionResults> GetCurrentConditionsByCoordinate(Coordinate coordinates)
+        {
+            var route = $"/data/2.5/weather?appid={weatherSettings.Value.ApiKey}&lat={coordinates.Latitude}&lon={coordinates.Longitude}";
+            var result = await apiClient.GetStringAsync(route);
+
+            if(result == null)
+            {
+                // TODO: Proper exception...
+                throw new ArgumentNullException(nameof(result));
+            }
+
+            var conditions = JsonSerializer.Deserialize<CurrentConditionResults>(result);
+
+            return conditions;
         }
     }
 }

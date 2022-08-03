@@ -69,5 +69,17 @@ namespace OpenWeather.Tests
                 });
             }
         }
+
+        [Test, Parallelizable]
+        [TestCase(39.8011, -84.2578)]
+        [TestCase(51.4862, -0.3083)]
+        public async Task GetCurrentConditionsByCoordinate(double lat, double lon) 
+        {
+            var coordinates = new Coordinate { Latitude = lat, Longitude = lon };
+            var result = WeatherService.GetCurrentConditionsByCoordinate(coordinates);
+
+            Assert.That(result, Is.Not.Null);
+        }
+
     }
 }
