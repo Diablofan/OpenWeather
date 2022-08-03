@@ -348,3 +348,6 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+
+#Ignore changes to this file to prevent adding secrets to git history.
+appsettings.Development.json
