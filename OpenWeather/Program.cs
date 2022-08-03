@@ -1,7 +1,19 @@
+using OpenWeather.Models;
+using OpenWeather.Pages;
+using OpenWeather.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+var owSettings = builder.Configuration.GetSection("OpenWeather");
+builder.Services.Configure<OpenWeatherSettings>(owSettings);
+
+builder.Services.AddHttpClient<WeatherService>(client =>
+{
+    client.BaseAddress = new Uri(owSettings.GetValue<string>("Endpoint"));
+});
+
+builder.Services.AddSingleton<IWeatherService, WeatherService>();
 
 var app = builder.Build();
 
