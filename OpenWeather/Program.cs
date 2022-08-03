@@ -1,10 +1,15 @@
+using FluentValidation;
 using OpenWeather.Models;
 using OpenWeather.Pages;
 using OpenWeather.Services;
+using OpenWeather.Validation;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+builder.Services.AddValidatorsFromAssemblyContaining<LookupValidator>();
+
 var owSettings = builder.Configuration.GetSection("OpenWeather");
 builder.Services.Configure<OpenWeatherSettings>(owSettings);
 

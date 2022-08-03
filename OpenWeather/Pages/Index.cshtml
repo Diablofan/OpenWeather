@@ -5,6 +5,34 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <form asp-page="/Weather" method="post">
+        <label for="cszLookup">Enter City, State / Zip Code</label>
+        <input id="cszLookup" name="cszLookup" type="text" />
+        <input type="submit" />
+        <br /><br />
+    </form>
+    <form asp-page="/Weather" method="post" id="geolocForm">
+        <label for="locationLookup">Look up by geolocation</label>
+        <button type="button" id="locationLookup"><i class="bi bi-search"></i></button>
+        <input type="hidden" name="lat" id="loc_lat" />
+        <input type="hidden" name="lon" id="loc_lon" />
+    </form>
 </div>
+
+<script>
+    if(navigator.geolocation) {
+        // Adapts JS Geolocation API to Async/await
+        function getCoordinates() {
+            return new Promise(function(resolve, reject) {
+                navigator.geolocation.getCurrentPosition(resolve, reject);
+            });
+        }
+
+        locationLookup.addEventListener('click', async () => {
+            let { coords: { latitude, longitude } } = await getCoordinates();
+            loc_lat.value = latitude;
+            loc_lon.value = longitude;
+            geolocForm.submit();
+        }); 
+    }
+</script>
