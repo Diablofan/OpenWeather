@@ -1,4 +1,51 @@
 ﻿@page
 @model OpenWeather.Pages.WeatherModel
 @{
+    ViewData["Title"] = "Current Conditions";
+    static string DirectionToFriendlyDisplay(double degrees)
+        => (degrees % 360) switch {
+            >= 337.5 => "Northernly",
+            >= 292.5 => "North-west",
+            >= 247.5 => "Westernly",
+            >= 202.5 => "South-west",
+            >= 157.5 => "Southernly",
+            >= 112.5 => "South-east",
+            >=  67.5 => "Easternly",
+            >=  22.5 => "North-east",
+            >=   0   => "Northernly",
+            // Some sort of weirdness is happening if we get here...
+                 _   => "strange"
+           };
+
+    var conditions = @Model.CurrentCondition;
+
+    var reportDisp = conditions.ReportTimestampUTC.FromUnixTimeStamp().ToLocalTime(conditions.TimezoneOffset).ToShortTimeString();
+    var actualTempDisp = conditions.AirTemperatures.ActualTempKelvin.ToFahrenheit().ToString("N0");
+    var feelsLikeDisp = conditions.AirTemperatures.HumanTempKelvin.ToFahrenheit().ToString("N0");
+    var sunriseDisp = conditions.Sys.SunriseUTC.FromUnixTimeStamp().ToLocalTime(conditions.TimezoneOffset).ToShortTimeString();
+    var sunsetDisp = conditions.Sys.SunsetUTC.FromUnixTimeStamp().ToLocalTime(conditions.TimezoneOffset).ToShortTimeString();
+    var visibilityDisp = (conditions.VisibilityInMeters / 1000).ToString("N1") + " KM";
+
+    var windSpeedMph = (conditions.Wind.Speed / 0.44704).ToString("N0");
+    var direction = DirectionToFriendlyDisplay(conditions.Wind.DegreesFromNorth);
 }
+
+<h1>@conditions.CityName - Current Conditions (As Of: @reportDisp)</h1>
+<br />
+<h4>It appears to be @conditions.Weather[0].LongDescription</h4>
+<h4>Current Temperature: @actualTempDisp °F (Feels Like: @feelsLikeDisp °F)</h4>
+<h5>Current Humidity is: @conditions.AirTemperatures.Humidity%</h5>
+<br />
+<div>
+    Sunrise was at: @sunriseDisp<br />
+    Sunset is at: @sunsetDisp
+</div>
+<div>
+    Current Visibility is: @visibilityDisp<br />
+    Winds are blowing at @windSpeedMph Miles per hour in a @direction direction
+</div>
+<br/>
+<div>
+    Coordinates for the query are:
+    @conditions.Coordinate.Latitude - @conditions.Coordinate.Longitude
+</div>
