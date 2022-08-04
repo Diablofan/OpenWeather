@@ -24,5 +24,16 @@ namespace OpenWeather.Tests
 
             Assert.That(result, Is.EqualTo(new DateTime(year, month, day, hour, minute, second, DateTimeKind.Utc)));
         }
+
+        [Test, Parallelizable]
+        [TestCase(272.15, 32)]
+        [TestCase(0, -459.67)]
+        [TestCase(373.15, 212)]
+        [TestCase(297.038889, 75)]
+        public void ToFahrenheit(double kelvin, double fahrenheit)
+        {
+            var result = Extensions.ToFahrenheit(kelvin);
+            Assert.That(result - fahrenheit, Is.LessThan(0.001));
+        }
     }
 }

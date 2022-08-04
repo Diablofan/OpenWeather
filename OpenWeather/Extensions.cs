@@ -16,5 +16,17 @@ namespace OpenWeather
         {
             return unixTimeStampBase.AddSeconds(timestamp);
         }
+
+        /// <summary>
+        /// Converts a kelvin based temperature to fahrenheit
+        /// </summary>
+        /// <param name="kelvin">The temperature in kelvin</param>
+        /// <returns>The temperature in fahrenheit</returns>
+        public static double ToFahrenheit(this double kelvin)
+        {
+            static double ToCelcius(double k) => k - 273.15;
+
+            return ToCelcius(kelvin) * 1.8 + 32;
+        }
     }
 }
