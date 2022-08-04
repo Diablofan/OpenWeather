@@ -28,5 +28,16 @@ namespace OpenWeather
 
             return ToCelcius(kelvin) * 1.8 + 32;
         }
+
+        /// <summary>
+        /// Adds an offset in seconds to convert a Utc Date Time to local time for the given offset.
+        /// </summary>
+        /// <param name="utc">The UTC Date Time to adjust</param>
+        /// <param name="offset">The offset in seconds from UTC</param>
+        /// <returns>A local time corresponding to the given UTC time</returns>
+        public static DateTime ToLocalTime(this DateTime utc, int offset)
+        {
+            return utc.AddSeconds(offset);
+        }
     }
 }

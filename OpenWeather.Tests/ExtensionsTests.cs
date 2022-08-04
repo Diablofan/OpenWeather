@@ -35,5 +35,20 @@ namespace OpenWeather.Tests
             var result = Extensions.ToFahrenheit(kelvin);
             Assert.That(result - fahrenheit, Is.LessThan(0.001));
         }
+
+        [Test, Parallelizable]
+        [TestCase(0, -14400, 1969, 12, 31, 20, 00, 00)]
+        [TestCase(100, 0, 1970, 1, 1, 0, 1, 40)]
+        [TestCase(957443115, 14400, 2000, 5, 4, 16, 25, 15)]
+        [TestCase(1842992919,      0, 2028, 05, 26, 22, 28, 39)]
+        [TestCase(1156539365,  -3600, 2006, 08, 25, 19, 56, 05)]
+        public void ToLocalTime(long utcTimeStamp, int offset, int year, int month, int day, int hour, int minute, int second)
+        {
+            var toDateTime = Extensions.FromUnixTimeStamp(utcTimeStamp);
+            var result = Extensions.ToLocalTime(toDateTime, offset);
+
+            var expected = new DateTime(year, month, day, hour, minute, second);
+            Assert.That(result, Is.EqualTo(expected));
+        }
     }
 }
