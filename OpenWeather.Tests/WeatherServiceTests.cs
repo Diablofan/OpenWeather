@@ -76,7 +76,7 @@ namespace OpenWeather.Tests
         public async Task GetCurrentConditionsByCoordinate(double lat, double lon) 
         {
             var coordinates = new Coordinate { Latitude = lat, Longitude = lon };
-            var result = WeatherService.GetCurrentConditionsByCoordinate(coordinates);
+            var result = await WeatherService.GetCurrentConditionsByCoordinate(coordinates);
 
             Assert.That(result, Is.Not.Null);
         }
