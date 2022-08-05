@@ -31,11 +31,11 @@ namespace OpenWeather.Pages
             }
             else if(lookup.IsZipCode)
             {
-                coordinate = await weatherService.GetCoordinatesByPostalCode(lookup.Zip);
+                coordinate = await weatherService.GetCoordinatesByPostalCode(lookup.CityStateZip);
             }
             else
             {
-                coordinate = await weatherService.GetCoordinateByCityState(lookup.City, lookup.State);
+                coordinate = await weatherService.GetCoordinatesByLocationName(lookup.CityStateZip);
             }
 
             CurrentCondition = await weatherService.GetCurrentConditionsByCoordinate(coordinate);
@@ -56,22 +56,5 @@ namespace OpenWeather.Pages
         public double Longitude { get; set; }
 
         public bool IsZipCode => Regex.IsMatch(CityStateZip, @"^([0-9]{5})(-[0-9]{4})?$");
-
-        public string City => CityStateZip.Split(",")[0].Trim() ?? string.Empty;
-
-        public string State
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(CityStateZip) || IsZipCode || !CityStateZip.Contains(","))
-                {
-                    return string.Empty;
-                }
-
-                return CityStateZip.Split(",")?[1]?.Trim() ?? string.Empty;
-            }
-        }
-
-        public string Zip => CityStateZip;
     }
 }

@@ -40,11 +40,11 @@ namespace OpenWeather.Tests
         }
 
         [Test, Parallelizable]
-        [TestCase("Trotwood", "OH", "US", "US", "Trotwood", 39.7972788, -84.3113334, "Ohio", 0, "", "")]
-        [TestCase("London", "", "GB", "GB", "London", 51.5073219, -0.1276474, "England", 0, "London", "London")]
-        public async Task GetCoordinateByCityState(string searchCity, string searchState, string searchCountry, string country, string name, double lat, double lon, string state, int nameCount, string feature_name, string ascii)
+        [TestCase("Trotwood, OH", "US", "US", "Trotwood", 39.7972788, -84.3113334, "Ohio", 0, "", "")]
+        [TestCase("London", "GB", "GB", "London", 51.5073219, -0.1276474, "England", 0, "London", "London")]
+        public async Task GetCoordinateByCityState(string searchCityState, string searchCountry, string country, string name, double lat, double lon, string state, int nameCount, string feature_name, string ascii)
         {
-            var result = await WeatherService.GetCoordinateByCityState(searchCity, searchState, searchCountry);
+            var result = await WeatherService.GetCoordinatesByLocationName(searchCityState, searchCountry);
             Assert.Multiple(() => {
                 Assert.That(result is LocationNameResult);
                 Assert.That(result.Country, Is.EqualTo(country));

@@ -21,7 +21,7 @@ namespace OpenWeather.Services
         /// <param name="state">The state of the city, may be blank</param>
         /// <param name="countryCode">The 2 character ISO 3166 country code the postal code belongs to</param>
         /// <returns>A set of coordinates for representing the postal code country combination</returns>
-        Task<LocationResult> GetCoordinateByCityState(string city, string state, string countryCode = "US");
+        Task<LocationResult> GetCoordinatesByLocationName(string cityState, string countryCode = "US");
 
         Task<CurrentConditionResults> GetCurrentConditionsByCoordinate(Coordinate coordinates);
     }
@@ -39,9 +39,9 @@ namespace OpenWeather.Services
             apiClient.BaseAddress = new Uri(weatherSettings.Value.Endpoint);
         }
 
-        public async Task<LocationResult> GetCoordinateByCityState(string city, string state, string countryCode)
+        public async Task<LocationResult> GetCoordinatesByLocationName(string cityState, string countryCode)
         {
-            var route = $"/geo/1.0/direct?appid={weatherSettings.Value.ApiKey}&limit=1&q={city},{state},{countryCode}";
+            var route = $"/geo/1.0/direct?appid={weatherSettings.Value.ApiKey}&limit=1&q={cityState},{countryCode}";
             var result = await apiClient.GetStringAsync(route);
 
             if(result == null)
