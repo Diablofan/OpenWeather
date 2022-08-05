@@ -81,6 +81,11 @@ namespace OpenWeather.Services
 
         private async Task HandleOpenWeatherException(HttpResponseMessage message)
         {
+            if(message.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new OpenWeatherException("Unauthorized. Please check your ApiKey");
+            }
+
             var error = await ReadResult<OpenWeatherError>(message);
 
             _logger.LogError($"Error from OpenWeatherMap: Code={error.ErrorCode} | Message={error.Message}");
