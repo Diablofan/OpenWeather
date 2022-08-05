@@ -14,7 +14,14 @@
         <select name="country" title="Country Selection">
             @foreach(var countryCode in Model.CountryCodes)
             {
-                <option value="@countryCode.Value">@countryCode.Key</option>
+                if(countryCode.Key.StartsWith("United States of"))
+                {
+                    <option value="@countryCode.Value" selected>@countryCode.Key</option>
+                }
+                else
+                {
+                    <option value="@countryCode.Value">@countryCode.Key</option>
+                }
             }
         </select>
         <br /><br />
