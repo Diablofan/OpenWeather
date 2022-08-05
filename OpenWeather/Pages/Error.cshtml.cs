@@ -29,12 +29,14 @@ namespace OpenWeather.Pages
         private void Handle()
         {
             RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
-            var exceptionHandlerPathFeature = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
-
             ExceptionMessage = "Something Happened.";
 
-            Exception? ex = exceptionHandlerPathFeature.Error;
-            _logger.LogError(ex, ex.Message, Array.Empty<object>());
+            var exceptionHandlerPathFeature = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
+            if(exceptionHandlerPathFeature is not null)
+            {
+                Exception ex = exceptionHandlerPathFeature.Error;
+                _logger.LogError(ex, ex.Message, Array.Empty<object>());
+            }
         }
     }
 }
