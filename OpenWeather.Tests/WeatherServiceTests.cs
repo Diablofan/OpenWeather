@@ -89,7 +89,7 @@ namespace OpenWeather.Tests
         [TestCase(100, 190)]
         [TestCase(0, 190)]
         [TestCase(100, 0)]
-        public async Task GetCurrentConditionsByCoordinate_Throws(double lat, double lon)
+        public void GetCurrentConditionsByCoordinate_Throws(double lat, double lon)
         {
             var coordinates = new Coordinate { Latitude = lat, Longitude = lon };
             Assert.ThrowsAsync<Exceptions.OpenWeatherException>(async () => await WeatherService.GetCurrentConditionsByCoordinate(coordinates));
