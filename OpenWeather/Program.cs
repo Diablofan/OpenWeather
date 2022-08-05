@@ -1,8 +1,8 @@
 using FluentValidation;
 using OpenWeather.Models;
-using OpenWeather.Pages;
 using OpenWeather.Services;
 using OpenWeather.Validation;
+using System.Collections.Generic;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +12,8 @@ builder.Services.AddValidatorsFromAssemblyContaining<LookupValidator>();
 
 var owSettings = builder.Configuration.GetSection("OpenWeather");
 builder.Services.Configure<OpenWeatherSettings>(owSettings);
+
+builder.Services.Configure<Dictionary<string, string>>(builder.Configuration.GetSection("CountryCodes"));
 
 builder.Services.AddHttpClient<WeatherService>(client =>
 {
