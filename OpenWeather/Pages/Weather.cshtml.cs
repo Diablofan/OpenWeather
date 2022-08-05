@@ -41,7 +41,7 @@ namespace OpenWeather.Pages
             CurrentCondition = await weatherService.GetCurrentConditionsByCoordinate(coordinate);
         }
 
-        public CurrentConditionResults CurrentCondition { get; set; }
+        public CurrentConditionResults? CurrentCondition { get; set; }
     }
 
     public class Lookup
