@@ -17,7 +17,7 @@
                  _   => "strange"
            };
 
-    var conditions = @Model.CurrentCondition;
+    var conditions = Model.CurrentCondition ?? new();
 
     var reportDisp = conditions.ReportTimestampUTC.FromUnixTimeStamp().ToLocalTime(conditions.TimezoneOffset).ToShortTimeString();
     var actualTempDisp = conditions.AirTemperatures.ActualTempKelvin.ToFahrenheit().ToString("N0");
