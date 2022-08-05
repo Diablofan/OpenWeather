@@ -52,7 +52,10 @@ namespace OpenWeather.Services
 
             var location = JsonSerializer.Deserialize<List<LocationNameResult>>(result);
 
-            return location.First();
+            ArgumentNullException.ThrowIfNull(location, nameof(location));
+
+            // TODO: Propert exceptions...
+            return location.First() ?? throw new ArgumentException();
         }
 
         public async Task<LocationResult> GetCoordinatesByPostalCode(string postalCode, string countryCode)
@@ -67,6 +70,8 @@ namespace OpenWeather.Services
             }
 
             var coordinate = JsonSerializer.Deserialize<PostalCodeResult>(result);
+
+            ArgumentNullException.ThrowIfNull(coordinate, nameof(coordinate));
 
             return coordinate;
         }
@@ -83,6 +88,8 @@ namespace OpenWeather.Services
             }
 
             var conditions = JsonSerializer.Deserialize<CurrentConditionResults>(result);
+
+            ArgumentNullException.ThrowIfNull(conditions, nameof(conditions));
 
             return conditions;
         }

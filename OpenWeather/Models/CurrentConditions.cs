@@ -124,7 +124,7 @@ namespace OpenWeather.Models
         public long ReportTimestampUTC { get; set; }
 
         [JsonPropertyName("sys")]
-        public System Sys { get; set; }
+        public System Sys { get; set; } = new();
 
         [JsonPropertyName("timezone")]
         public int TimezoneOffset { get; set; }
