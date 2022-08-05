@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
+using OpenWeather.Exceptions;
 using OpenWeather.Models;
 using System.Text.Json;
 
@@ -30,11 +31,13 @@ namespace OpenWeather.Services
     {
         private readonly HttpClient _apiClient;
         private readonly IOptions<OpenWeatherSettings> _weatherSettings;
+        private readonly ILogger<IWeatherService> _logger;
 
-        public WeatherService(HttpClient apiClient, IOptions<OpenWeatherSettings> weatherSettings)
+        public WeatherService(HttpClient apiClient, IOptions<OpenWeatherSettings> weatherSettings, ILogger<IWeatherService> logger)
         {
             _apiClient = apiClient ?? throw new ArgumentNullException(nameof(apiClient));
             _weatherSettings = weatherSettings ?? throw new ArgumentNullException(nameof(weatherSettings));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             _apiClient.BaseAddress = new Uri(weatherSettings.Value.Endpoint);
         }
@@ -44,10 +47,9 @@ namespace OpenWeather.Services
             var route = $"/geo/1.0/direct?limit=1&q={cityState},{countryCode}";
             var results = await SendRequest<List<LocationNameResult>>(route);
 
-            if(results.Count == 0)
+            if (results.Count == 0)
             {
-                // TODO: Proper exception...
-                throw new ArgumentNullException(nameof(results));
+                throw new OpenWeatherException($"No Locations Found for: {cityState} in {countryCode}");
             }
 
             return results.First();
@@ -71,11 +73,21 @@ namespace OpenWeather.Services
 
             if (result.StatusCode != System.Net.HttpStatusCode.OK)
             {
-                // TODO: Proper exception...
-                throw new ArgumentNullException(nameof(result));
+                await HandleOpenWeatherException(result);
             }
 
             return await ReadResult<T>(result);
+        }
+
+        private async Task HandleOpenWeatherException(HttpResponseMessage message)
+        {
+            var error = await ReadResult<OpenWeatherError>(message);
+
+            _logger.LogError($"Error from OpenWeatherMap: Code={error.ErrorCode} | Message={error.Message}");
+
+            var ex = new OpenWeatherException(error.Message);
+            ex.Data.Add("Code", error.ErrorCode);
+            throw ex;
         }
 
         private static async Task<T> ReadResult<T>(HttpResponseMessage message)

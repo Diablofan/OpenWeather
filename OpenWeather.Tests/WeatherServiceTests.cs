@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Logging.Abstractions;
+
 namespace OpenWeather.Tests
 {
     public class WeatherServiceTests
@@ -15,8 +17,9 @@ namespace OpenWeather.Tests
             };
 
             var options = new OptionsWrapper<OpenWeatherSettings>(config);
+            var null_logger = new NullLogger<IWeatherService>();
 
-            WeatherService = new WeatherService(httpClient, options);
+            WeatherService = new WeatherService(httpClient, options, null_logger);
         }
 
         [Test, Parallelizable]
@@ -81,5 +84,15 @@ namespace OpenWeather.Tests
             Assert.That(result, Is.Not.Null);
         }
 
+
+        [Test, Parallelizable]
+        [TestCase(100, 190)]
+        [TestCase(0, 190)]
+        [TestCase(100, 0)]
+        public async Task GetCurrentConditionsByCoordinate_Throws(double lat, double lon)
+        {
+            var coordinates = new Coordinate { Latitude = lat, Longitude = lon };
+            Assert.ThrowsAsync<Exceptions.OpenWeatherException>(async () => await WeatherService.GetCurrentConditionsByCoordinate(coordinates));
+        }
     }
 }
