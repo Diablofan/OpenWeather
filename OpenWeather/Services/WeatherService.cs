@@ -28,70 +28,64 @@ namespace OpenWeather.Services
 
     public class WeatherService : IWeatherService
     {
-        private readonly HttpClient apiClient;
-        private readonly IOptions<OpenWeatherSettings> weatherSettings;
+        private readonly HttpClient _apiClient;
+        private readonly IOptions<OpenWeatherSettings> _weatherSettings;
 
         public WeatherService(HttpClient apiClient, IOptions<OpenWeatherSettings> weatherSettings)
         {
-            this.apiClient = apiClient ?? throw new ArgumentNullException(nameof(apiClient));
-            this.weatherSettings = weatherSettings ?? throw new ArgumentNullException(nameof(weatherSettings));
+            _apiClient = apiClient ?? throw new ArgumentNullException(nameof(apiClient));
+            _weatherSettings = weatherSettings ?? throw new ArgumentNullException(nameof(weatherSettings));
 
-            apiClient.BaseAddress = new Uri(weatherSettings.Value.Endpoint);
+            _apiClient.BaseAddress = new Uri(weatherSettings.Value.Endpoint);
         }
 
         public async Task<LocationResult> GetCoordinatesByLocationName(string cityState, string countryCode)
         {
-            var route = $"/geo/1.0/direct?appid={weatherSettings.Value.ApiKey}&limit=1&q={cityState},{countryCode}";
-            var result = await apiClient.GetStringAsync(route);
+            var route = $"/geo/1.0/direct?limit=1&q={cityState},{countryCode}";
+            var results = await SendRequest<List<LocationNameResult>>(route);
 
-            if(result == null)
+            if(results.Count == 0)
             {
                 // TODO: Proper exception...
-                throw new ArgumentNullException(nameof(result));
+                throw new ArgumentNullException(nameof(results));
             }
 
-            var location = JsonSerializer.Deserialize<List<LocationNameResult>>(result);
-
-            ArgumentNullException.ThrowIfNull(location, nameof(location));
-
-            // TODO: Propert exceptions...
-            return location.First() ?? throw new ArgumentException();
+            return results.First();
         }
 
         public async Task<LocationResult> GetCoordinatesByPostalCode(string postalCode, string countryCode)
         {
-            var route = $"/geo/1.0/zip?appid={weatherSettings.Value.ApiKey}&zip={postalCode},{countryCode}";
-            var result = await apiClient.GetStringAsync(route);
-
-            if(result == null)
-            {
-                // TODO: Proper exception...
-                throw new ArgumentNullException(nameof(result));
-            }
-
-            var coordinate = JsonSerializer.Deserialize<PostalCodeResult>(result);
-
-            ArgumentNullException.ThrowIfNull(coordinate, nameof(coordinate));
-
-            return coordinate;
+            var route = $"/geo/1.0/zip?zip={postalCode},{countryCode}";
+            return await SendRequest<PostalCodeResult>(route);
         }
 
         public async Task<CurrentConditionResults> GetCurrentConditionsByCoordinate(Coordinate coordinates)
         {
-            var route = $"/data/2.5/weather?appid={weatherSettings.Value.ApiKey}&lat={coordinates.Latitude}&lon={coordinates.Longitude}";
-            var result = await apiClient.GetStringAsync(route);
+            var route = $"/data/2.5/weather?lat={coordinates.Latitude}&lon={coordinates.Longitude}";
+            return await SendRequest<CurrentConditionResults>(route);
+        }
 
-            if(result == null)
+        private async Task<T> SendRequest<T>(string route)
+        {
+            var result = await _apiClient.GetAsync($"{route}&appid={_weatherSettings.Value.ApiKey}");
+
+            if (result.StatusCode != System.Net.HttpStatusCode.OK)
             {
                 // TODO: Proper exception...
                 throw new ArgumentNullException(nameof(result));
             }
 
-            var conditions = JsonSerializer.Deserialize<CurrentConditionResults>(result);
+            return await ReadResult<T>(result);
+        }
 
-            ArgumentNullException.ThrowIfNull(conditions, nameof(conditions));
+        private static async Task<T> ReadResult<T>(HttpResponseMessage message)
+        {
+            var stream = await message.Content.ReadAsStreamAsync();
+            var result = await JsonSerializer.DeserializeAsync<T>(stream);
 
-            return conditions;
+            ArgumentNullException.ThrowIfNull(result, nameof(result));
+
+            return result;
         }
     }
 }
