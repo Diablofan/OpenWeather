@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Diagnostics;
@@ -12,6 +13,8 @@ namespace OpenWeather.Pages
 
         public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
 
+        public string ExceptionMessage { get; private set; } = string.Empty;
+
         private readonly ILogger<ErrorModel> _logger;
 
         public ErrorModel(ILogger<ErrorModel> logger)
@@ -19,9 +22,19 @@ namespace OpenWeather.Pages
             _logger = logger;
         }
 
-        public void OnGet()
+        public void OnGet() => Handle();
+
+        public void OnPost() => Handle();
+
+        private void Handle()
         {
             RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+            var exceptionHandlerPathFeature = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
+
+            ExceptionMessage = "Something Happened.";
+
+            Exception? ex = exceptionHandlerPathFeature.Error;
+            _logger.LogError(ex, ex.Message, Array.Empty<object>());
         }
     }
 }
