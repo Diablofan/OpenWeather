@@ -31,11 +31,11 @@ namespace OpenWeather.Pages
             }
             else if(lookup.IsPostCode)
             {
-                coordinate = await weatherService.GetCoordinatesByPostalCode(lookup.NameOrPostCode);
+                coordinate = await weatherService.GetCoordinatesByPostalCode(lookup.NameOrPostCode, lookup.Country);
             }
             else
             {
-                coordinate = await weatherService.GetCoordinatesByLocationName(lookup.NameOrPostCode);
+                coordinate = await weatherService.GetCoordinatesByLocationName(lookup.NameOrPostCode, lookup.Country);
             }
 
             CurrentCondition = await weatherService.GetCurrentConditionsByCoordinate(coordinate);
@@ -48,6 +48,9 @@ namespace OpenWeather.Pages
     {
         [BindProperty(Name = "nameOrPostCodeLookup")]
         public string NameOrPostCode { get; set; } = string.Empty;
+
+        [BindProperty(Name = "country")]
+        public string Country { get; set; } = string.Empty;
 
         [BindProperty(Name = "lat")]
         public double Latitude { get; set; }
