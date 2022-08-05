@@ -22,20 +22,20 @@ namespace OpenWeather.Pages
         {
             Coordinate coordinate;
 
-            if(string.IsNullOrEmpty(lookup.CityStateZip))
+            if(string.IsNullOrEmpty(lookup.NameOrPostCode))
             {
                 coordinate = new() {
                     Longitude = lookup.Longitude,
                     Latitude = lookup.Latitude
                 };
             }
-            else if(lookup.IsZipCode)
+            else if(lookup.IsPostCode)
             {
-                coordinate = await weatherService.GetCoordinatesByPostalCode(lookup.CityStateZip);
+                coordinate = await weatherService.GetCoordinatesByPostalCode(lookup.NameOrPostCode);
             }
             else
             {
-                coordinate = await weatherService.GetCoordinatesByLocationName(lookup.CityStateZip);
+                coordinate = await weatherService.GetCoordinatesByLocationName(lookup.NameOrPostCode);
             }
 
             CurrentCondition = await weatherService.GetCurrentConditionsByCoordinate(coordinate);
@@ -46,8 +46,8 @@ namespace OpenWeather.Pages
 
     public class Lookup
     {
-        [BindProperty(Name = "cszLookup")]
-        public string CityStateZip { get; set; } = string.Empty;
+        [BindProperty(Name = "nameOrPostCodeLookup")]
+        public string NameOrPostCode { get; set; } = string.Empty;
 
         [BindProperty(Name = "lat")]
         public double Latitude { get; set; }
@@ -55,6 +55,6 @@ namespace OpenWeather.Pages
         [BindProperty(Name = "lon")]
         public double Longitude { get; set; }
 
-        public bool IsZipCode => Regex.IsMatch(CityStateZip, @"^([0-9]{5})(-[0-9]{4})?$");
+        public bool IsPostCode => Regex.IsMatch(NameOrPostCode, @"^([0-9]{5})(-[0-9]{4})?$");
     }
 }
